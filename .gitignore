@@ -4,3 +4,5 @@
 /proxyclient/*.iml
 /proxyserver/target
 /proxyserver/proxyserver.iml
+/clientOnTomcat/target
+/clientOnTomcat/clientOnTomcat.iml
