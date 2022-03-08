@@ -16,6 +16,7 @@
     <module>proxyclient</module>
     <module>proxyserver</module>
     <module>clientOnTomcat</module>
+      <module>sock5server</module>
   </modules>
 
   <properties>
