@@ -14,7 +14,7 @@ public class Socks5Proxy {
                 ChannelPipeline pipeline = socketChannel.pipeline();
                 // 添加socks5编码器
                 pipeline.addLast("socks5encoder", Socks5ServerEncoder.DEFAULT);
-                pipeline.addLast("")
+                pipeline.addLast("test", new Socks5InitialRequestDecoder());
             }
         };
     }
