@@ -17,6 +17,7 @@ public class Socks5Proxy {
                 // 添加socks5编码器
                 pipeline.addLast("socks5encoder", Socks5ServerEncoder.DEFAULT);
                 pipeline.addLast("socks5decoder", new Socks5InitialRequestDecoder());
+                // 确认socks5交换方法
                 pipeline.addLast("initialRequest", new Socks5InitialRequestHandler());
                 pipeline.addLast("socks5CmdDecoder", new Socks5CommandRequestDecoder());
             }
