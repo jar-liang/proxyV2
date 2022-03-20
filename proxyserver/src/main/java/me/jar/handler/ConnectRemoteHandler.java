@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequestEncoder;
 import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 import me.jar.beans.HostAndPort;
 import me.jar.utils.NettyUtil;
 import org.slf4j.Logger;
@@ -43,6 +44,8 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
             }
         } else {
             LOGGER.warn("===Receive other date (not FullHttpRequest), skip");
+            // 释放资源
+            ReferenceCountUtil.release(msg);
         }
     }
 
