@@ -38,7 +38,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>2.3.6.RELEASE</version>
         <configuration>
-          <mainClass>me.jar.starter.ServerStarter</mainClass>
+          <mainClass>me.jar.sock5.starter.Socks5Proxy</mainClass>
         </configuration>
         <executions>
           <execution>

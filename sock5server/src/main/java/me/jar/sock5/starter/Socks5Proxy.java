@@ -11,6 +11,8 @@ import me.jar.sock5.starter.handler.Socks5InitialRequestHandler;
 import me.jar.utils.NettyUtil;
 
 public class Socks5Proxy {
+    private static int port = 9999; // todo 后面要动态读取
+
     public static void main(String[] args) {
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
@@ -29,6 +31,6 @@ public class Socks5Proxy {
             }
         };
 
-        NettyUtil.starServer(12222, channelInitializer);
+        NettyUtil.starServer(port, channelInitializer);
     }
 }
