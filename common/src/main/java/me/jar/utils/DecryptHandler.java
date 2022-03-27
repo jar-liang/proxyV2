@@ -48,7 +48,7 @@ public class DecryptHandler extends ReplayingDecoder<DecryptDecoderState> {
                     int readableBytes = byteBuf.readableBytes();
                     byteBuf.getBytes(readableBytes - 4, markBytes);
                     for (int i = 0; i < markBytes.length; i++) {
-                        if (markBytes[i] != 8) {
+                        if (markBytes[i] != ProxyConstants.MARK_BYTE[i]) {
                             LOGGER.info("===Illegal data from ip: {}", ctx.channel().remoteAddress());
                             ctx.close();
                             return;
