@@ -25,14 +25,7 @@ public class JustSendHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (remoteChannel.isActive()) {
-            remoteChannel.writeAndFlush(msg).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    LOGGER.debug("<<<Has been replying request data (https) to remote");
-                } else {
-                    LOGGER.error("===Failed to send client data(https) to remote!");
-                    ReferenceCountUtil.release(msg);
-                }
-            });
+            remoteChannel.writeAndFlush(msg);
         } else {
             LOGGER.info("===Remote channel disconnected, no transferring data.");
             ReferenceCountUtil.release(msg);
@@ -42,7 +35,7 @@ public class JustSendHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOGGER.info("===Client channel disconnected");
+        LOGGER.debug("===Client channel disconnected");
         NettyUtil.closeOnFlush(remoteChannel);
         ctx.close();
     }

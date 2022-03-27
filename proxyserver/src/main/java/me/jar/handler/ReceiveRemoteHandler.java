@@ -34,7 +34,7 @@ public class ReceiveRemoteHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOGGER.info("===Remote channel disconnected");
+        LOGGER.debug("===Remote channel disconnected");
         NettyUtil.closeOnFlush(nearChannel);
         ctx.close();
     }

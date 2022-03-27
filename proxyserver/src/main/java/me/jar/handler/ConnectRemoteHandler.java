@@ -80,7 +80,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
                     }
                 });
             } else {
-                LOGGER.error("<<<Connecting server failed (https)!");
+                LOGGER.error("<<<Connecting server failed (https)! host: " + hostAndPort.getHost() + ", port: " + hostAndPort.getPort());
                 ctx.close();
             }
         });
@@ -97,6 +97,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
             });
         } else {
             String address = httpRequest.headers().get(HttpHeaderNames.HOST);
+            LOGGER.info("http host address = " + address);
             HostAndPort hostAndPort = NettyUtil.parseHostAndPort(address, 80);
 
             Bootstrap bootstrap = new Bootstrap();
@@ -123,7 +124,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
                         }
                     });
                 } else {
-                    LOGGER.error("<<<Connecting server failed!");
+                    LOGGER.error("<<<Connecting server failed! host: " + hostAndPort.getHost() + ", port: " + hostAndPort.getPort());
                     ctx.close();
                 }
             });
@@ -132,7 +133,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOGGER.info("===Client channel disconnected");
+        LOGGER.debug("===Client channel disconnected");
         NettyUtil.closeOnFlush(remoteChannel);
         ctx.close();
     }
