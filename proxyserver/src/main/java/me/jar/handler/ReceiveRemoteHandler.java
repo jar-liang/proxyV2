@@ -41,7 +41,7 @@ public class ReceiveRemoteHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOGGER.error("===ReceiveRemoteHandler caught exception, cause: {}", cause.getMessage());
+        LOGGER.error("===ReceiveRemoteHandler caught exception, cause: {}", cause.getMessage() + ". host: " + ctx.channel().remoteAddress().toString());
         NettyUtil.closeOnFlush(nearChannel);
         ctx.close();
     }

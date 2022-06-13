@@ -33,9 +33,9 @@ public class ServerStarter {
                 ChannelPipeline pipeline = ch.pipeline();
                 // 添加与客户端交互的handler
                 pipeline.addLast("decrypt", new DecryptHandler());
-                pipeline.addLast("decoder", new HttpRequestDecoder());
-                pipeline.addLast("aggregator", new HttpObjectAggregator(20 * 1024 * 1024));
                 pipeline.addLast("encrypt", new EncryptHandler());
+                pipeline.addLast("decoder", new HttpRequestDecoder());
+                pipeline.addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
                 pipeline.addLast("connectRemote", new ConnectRemoteHandler());
             }
         };

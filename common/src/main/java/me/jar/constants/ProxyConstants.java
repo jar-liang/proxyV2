@@ -13,7 +13,7 @@ public interface ProxyConstants {
     /**
      * 特定标识字节，用于标识数据流是否合法源发出
      */
-    byte[] MARK_BYTE = new byte[] {8, 8, 8, 8};
+    byte[] MARK_BYTE = new byte[] {2, 4, 6, 8};
 
     int WIN_OS = 1;
 

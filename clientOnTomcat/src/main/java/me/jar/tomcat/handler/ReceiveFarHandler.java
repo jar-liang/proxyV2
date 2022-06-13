@@ -34,14 +34,14 @@ public class ReceiveFarHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOGGER.info("===Far channel disconnected");
+        LOGGER.debug("===Far channel disconnected");
         NettyUtil.closeOnFlush(clientChannel);
         ctx.close();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOGGER.error("===ReceiveRemoteHandler caught exception, cause: {}", cause.getMessage());
+        LOGGER.error("===ReceiveRemoteHandler caught exception, cause: {}", cause.getMessage() + ". host: " + ctx.channel().remoteAddress().toString());
         NettyUtil.closeOnFlush(clientChannel);
         ctx.close();
     }

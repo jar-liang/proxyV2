@@ -36,7 +36,11 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest httpRequest = (FullHttpRequest) msg;
-            LOGGER.info(">>>Receive Http request, uri -> {}", httpRequest.uri());
+            if ("/bad-request".equals(httpRequest.uri())) {
+                LOGGER.error("/bad-request: " + httpRequest.toString());
+            } else {
+                LOGGER.info(">>>Receive Http request, uri -> {}", httpRequest.uri());
+            }
             if (HttpMethod.CONNECT.equals(httpRequest.method())) {
                 connectRemoteReplyClient(ctx, httpRequest);
             } else {
@@ -97,7 +101,13 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
             });
         } else {
             String address = httpRequest.headers().get(HttpHeaderNames.HOST);
-            LOGGER.info("http host address = " + address);
+            if (address == null || address.length() == 0) {
+                LOGGER.error("Receive empty host address!");
+                ctx.close();
+                return;
+            } else {
+                LOGGER.info("http host address = " + address);
+            }
             HostAndPort hostAndPort = NettyUtil.parseHostAndPort(address, 80);
 
             Bootstrap bootstrap = new Bootstrap();
