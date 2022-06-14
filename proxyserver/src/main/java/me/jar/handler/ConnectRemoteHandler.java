@@ -143,6 +143,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        // 不要打印太多日志
         LOGGER.debug("===Client channel disconnected");
         NettyUtil.closeOnFlush(remoteChannel);
         ctx.close();
