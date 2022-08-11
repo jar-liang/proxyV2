@@ -5,6 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import me.jar.constants.ProxyConstants;
 import me.jar.handler.ConnectRemoteHandler;
 import me.jar.utils.DecryptHandler;
@@ -36,6 +37,7 @@ public class ServerStarter {
                 pipeline.addLast("encrypt", new EncryptHandler());
                 pipeline.addLast("decoder", new HttpRequestDecoder());
                 pipeline.addLast("aggregator", new HttpObjectAggregator(10 * 1024 * 1024));
+                pipeline.addLast("chunk", new ChunkedWriteHandler());
                 pipeline.addLast("connectRemote", new ConnectRemoteHandler());
             }
         };

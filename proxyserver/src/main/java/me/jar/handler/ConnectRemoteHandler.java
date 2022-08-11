@@ -35,6 +35,7 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
+            ctx.channel().config().setAutoRead(false);
             FullHttpRequest httpRequest = (FullHttpRequest) msg;
             if ("/bad-request".equals(httpRequest.uri())) {
                 LOGGER.error("/bad-request: " + httpRequest.toString());
@@ -79,8 +80,10 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
                         nearPipeline.remove("aggregator");
                         nearPipeline.remove("connectRemote");
                         nearPipeline.addLast("justSend", new JustSendHandler(remoteChannel));
+                        ctx.channel().config().setAutoRead(true);
                     } else {
                         LOGGER.error("<<<Reply to client message failed!");
+                        NettyUtil.closeOnFlush(remoteChannel);
                     }
                 });
             } else {
@@ -97,13 +100,14 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
                     LOGGER.debug(">>>Sending request to server done (via exist channel).");
                 } else {
                     LOGGER.error("<<<Sending request to server failed (via exist channel)!");
+                    NettyUtil.closeOnFlush(ctx.channel());
                 }
             });
         } else {
             String address = httpRequest.headers().get(HttpHeaderNames.HOST);
             if (address == null || address.length() == 0) {
                 LOGGER.error("Receive empty host address!");
-                ctx.close();
+                NettyUtil.closeOnFlush(ctx.channel());
                 return;
             } else {
                 LOGGER.info("http host address = " + address);
@@ -126,16 +130,18 @@ public class ConnectRemoteHandler extends ChannelInboundHandlerAdapter {
                 if (connectFuture.isSuccess()) {
                     LOGGER.debug(">>>Connecting server done (http).");
                     remoteChannel = connectFuture.channel();
+                    ctx.channel().config().setAutoRead(true);
                     remoteChannel.writeAndFlush(httpRequest).addListener((ChannelFutureListener) future -> {
                         if (future.isSuccess()) {
                             LOGGER.debug(">>>Sending request to server done.");
                         } else {
                             LOGGER.error("<<<Sending request to server failed!");
+                            NettyUtil.closeOnFlush(ctx.channel());
                         }
                     });
                 } else {
                     LOGGER.error("<<<Connecting server failed! host: " + hostAndPort.getHost() + ", port: " + hostAndPort.getPort());
-                    ctx.close();
+                    NettyUtil.closeOnFlush(ctx.channel());
                 }
             });
         }

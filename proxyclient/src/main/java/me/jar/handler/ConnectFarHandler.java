@@ -10,7 +10,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.ReferenceCountUtil;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import me.jar.constants.ProxyConstants;
 import me.jar.utils.DecryptHandler;
 import me.jar.utils.EncryptHandler;
@@ -33,15 +33,22 @@ public class ConnectFarHandler extends ChannelInboundHandlerAdapter {
         if (farChannel != null && farChannel.isActive()) {
             farChannel.writeAndFlush(msg);
         } else {
-            if (!ProxyConstants.PROPERTY.containsKey(ProxyConstants.FAR_SERVER_IP) || !ProxyConstants.PROPERTY.containsKey(ProxyConstants.KEY_NAME_PORT)) {
-                LOGGER.error("===Property file has no far server ip or port, please check!");
-                ReferenceCountUtil.release(msg);
-                ctx.close();
-                return;
-            }
+            LOGGER.error("far channel not active!");
+            NettyUtil.closeOnFlush(ctx.channel());
+        }
+    }
 
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(ctx.channel().eventLoop()).channel(NioSocketChannel.class)
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        ctx.channel().config().setAutoRead(false);
+        if (!ProxyConstants.PROPERTY.containsKey(ProxyConstants.FAR_SERVER_IP) || !ProxyConstants.PROPERTY.containsKey(ProxyConstants.KEY_NAME_PORT)) {
+            LOGGER.error("===Property file has no far server ip or port, please check!");
+            ctx.close();
+            return;
+        }
+
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(ctx.channel().eventLoop()).channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -50,24 +57,23 @@ public class ConnectFarHandler extends ChannelInboundHandlerAdapter {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast("decrypt", new DecryptHandler());
                         pipeline.addLast("encrypt", new EncryptHandler());
+                        pipeline.addLast("chunk", new ChunkedWriteHandler());
                         pipeline.addLast("receiveFar", new ReceiveFarHandler(ctx.channel()));
                     }
                 });
-            String host = ProxyConstants.PROPERTY.get(ProxyConstants.FAR_SERVER_IP);
-            int port = Integer.parseInt(ProxyConstants.PROPERTY.get(ProxyConstants.FAR_SERVER_PORT));
-            bootstrap.connect(host, port)
+        String host = ProxyConstants.PROPERTY.get(ProxyConstants.FAR_SERVER_IP);
+        int port = Integer.parseInt(ProxyConstants.PROPERTY.get(ProxyConstants.FAR_SERVER_PORT));
+        bootstrap.connect(host, port)
                 .addListener((ChannelFutureListener) connectFuture -> {
                     if (connectFuture.isSuccess()) {
                         LOGGER.debug(">>>Connect far server successfully.");
                         farChannel = connectFuture.channel();
-                        farChannel.writeAndFlush(msg);
+                        ctx.channel().config().setAutoRead(true);
                     } else {
                         LOGGER.error("===Failed to connect to far server! host: " + host + " , port: " + port);
-                        ReferenceCountUtil.release(msg);
                         ctx.close();
                     }
                 });
-        }
     }
 
     @Override

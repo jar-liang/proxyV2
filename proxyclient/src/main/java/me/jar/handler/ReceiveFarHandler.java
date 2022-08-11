@@ -3,7 +3,6 @@ package me.jar.handler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 import me.jar.utils.NettyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,7 @@ public class ReceiveFarHandler extends ChannelInboundHandlerAdapter {
             clientChannel.writeAndFlush(msg);
         } else {
             LOGGER.error("===Client channel disconnected, no transferring data.");
-            ReferenceCountUtil.release(msg);
-            ctx.close();
+            NettyUtil.closeOnFlush(ctx.channel());
         }
     }
 
