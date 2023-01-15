@@ -21,9 +21,9 @@ public interface ProxyConstants {
 
     int OTHER_OS = 3;
 
-    String PROPERTY_NAME_WIN = "D:\\usr\\property\\property.txt";
+    String PROPERTY_NAME_WIN = System.getProperty("WORKDIR") + "\\property.txt";
 
-    String PROPERTY_NAME_LINUX= "/usr/property/property.txt";
+    String PROPERTY_NAME_LINUX= System.getProperty("WORKDIR") + "/property.txt";
 
     String KEY_NAME_PORT = "listenning.port";
 
